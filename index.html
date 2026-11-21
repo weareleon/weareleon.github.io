@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>weareleon</title>
+<meta name="description" content="weareleon makes self-hosted radio, TV and music tools: turn the media you already own into channels, stations and streams.">
+<meta property="og:title" content="weareleon">
+<meta property="og:description" content="Self-hosted radio, TV and other stupid stuff.">
+<meta property="og:image" content="https://avatars.githubusercontent.com/u/263047087?v=4">
+<link rel="icon" href="https://avatars.githubusercontent.com/u/263047087?v=4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c10; --bg2:#12141a; --panel:#161921; --line:#262a35;
+  --ink:#eceef3; --muted:#9097a8; --dim:#5d6476;
+  --red:#ff3b3b; --amber:#ffb020; --green:#33d17a; --cyan:#35c7f0; --magenta:#e35bd8; --yellow:#ffe14d; --blue:#4d7cff;
+  --radius:14px;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --sans:"Space Grotesk",system-ui,-apple-system,Segoe UI,sans-serif;
+  --tt:"VT323",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+@media (max-width:520px){.wrap{padding:0 16px}}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;height:56px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;text-decoration:none;letter-spacing:-.01em}
+.logo img{width:26px;height:26px;border-radius:6px}
+.bar nav{margin-left:auto;display:flex;gap:22px;font-size:14px}
+.bar nav a{text-decoration:none;color:var(--muted)}
+.bar nav a:hover{color:var(--ink)}
+.clock{font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.tally{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 2s infinite}
+@keyframes blink{50%{opacity:.35}}
+@media (max-width:720px){.bar nav{display:none}.clock{margin-left:auto}}
+
+/* hero */
+.hero{position:relative;padding:96px 0 72px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(600px 300px at 80% 10%,rgba(255,59,59,.16),transparent 70%),
+  radial-gradient(500px 300px at 10% 90%,rgba(53,199,240,.10),transparent 70%);pointer-events:none}
+.hero::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none}
+.onair{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;border:1px solid rgba(255,59,59,.5);color:var(--red);padding:6px 12px;border-radius:999px;background:rgba(255,59,59,.07)}
+h1{font-size:clamp(44px,9vw,104px);line-height:.95;letter-spacing:-.04em;font-weight:700;margin:22px 0 22px}
+h1 .bars{display:block;height:10px;width:min(420px,70%);margin-top:18px;border-radius:3px;background:linear-gradient(90deg,#fff 0 14.28%,var(--yellow) 0 28.56%,var(--cyan) 0 42.84%,var(--green) 0 57.12%,var(--magenta) 0 71.4%,var(--red) 0 85.68%,var(--blue) 0)}
+.lede{font-size:clamp(18px,2.2vw,22px);color:var(--muted);max-width:640px}
+.lede b{color:var(--ink);font-weight:500}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:10px;font-weight:500;text-decoration:none;border:1px solid var(--line);background:var(--panel);transition:transform .15s,border-color .15s}
+.btn:hover{transform:translateY(-1px);border-color:#3a4050}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn svg{width:18px;height:18px}
+
+/* sections */
+section{padding:80px 0;border-top:1px solid var(--line)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:12px}
+h2{font-size:clamp(30px,4.5vw,44px);letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
+.sub{color:var(--muted);max-width:640px;font-size:18px}
+
+/* about */
+.about{display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:start}
+.about p+p{margin-top:16px}
+.about .copy p{color:var(--muted);font-size:17px}
+.about .copy p b{color:var(--ink);font-weight:500}
+.principles{display:grid;gap:12px}
+.pr{display:flex;gap:14px;padding:18px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}
+.pr .n{font-family:var(--mono);color:var(--dim);font-size:13px;padding-top:2px}
+.pr h3{font-size:16px;margin-bottom:2px}
+.pr p{color:var(--muted);font-size:15px}
+@media (max-width:860px){.about{grid-template-columns:1fr}}
+
+/* guide */
+.guide-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:inherit;font-size:14px;color:var(--muted);background:transparent;border:1px solid var(--line);padding:7px 14px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+@media (max-width:380px){.grid{grid-template-columns:1fr}}
+.card{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 55%,var(--line))}
+.card[hidden]{display:none}
+.card .strip{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--muted);background:linear-gradient(90deg,color-mix(in srgb,var(--c) 16%,transparent),transparent 70%)}
+.card .ch{color:var(--c);font-weight:600;letter-spacing:.08em}
+.card .body{padding:20px 18px 18px;flex:1;display:flex;flex-direction:column}
+.card h3{font-size:24px;letter-spacing:-.02em;margin-bottom:8px}
+.card p{color:var(--muted);font-size:15px}
+.card ul{list-style:none;margin:14px 0 18px;display:grid;gap:6px;font-size:14px;color:var(--muted)}
+.card li::before{content:"▸ ";color:var(--c)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
+.tag{font-family:var(--mono);font-size:11.5px;padding:3px 8px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);color:var(--muted)}
+.card .foot{display:flex;gap:16px;align-items:center;padding:12px 18px;border-top:1px solid var(--line);font-size:14px}
+.card .foot a{text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.card .foot a:hover{color:var(--c)}
+.card .foot .meta{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.card.feature{grid-column:1/-1}
+.card.feature .body{display:grid;grid-template-columns:1.2fr 1fr;gap:28px}
+.card.feature h3{font-size:32px}
+@media (max-width:760px){.card.feature .body{grid-template-columns:1fr}}
+
+/* teletext flow */
+.tt{font-family:var(--tt);font-size:22px;line-height:1.15;background:#000;color:#fff;border-radius:var(--radius);padding:22px;border:1px solid var(--line);overflow:hidden}
+.tt .row{white-space:pre-wrap}
+.tt .y{color:#ff0}.tt .c{color:#0ff}.tt .g{color:#0f0}.tt .m{color:#f0f}.tt .r{color:#f33}
+.tt .hdr{background:#00f;color:#ff0;padding:0 6px;display:inline-block}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.step{border:1px solid var(--line);border-radius:var(--radius);padding:20px;background:var(--panel);position:relative}
+.step .k{font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:10px}
+.step h3{font-size:18px;margin-bottom:6px}
+.step p{font-size:14.5px;color:var(--muted)}
+.step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:18px;z-index:1;background:var(--bg);line-height:1}
+@media (max-width:860px){.flow{grid-template-columns:1fr 1fr}.step::after{display:none}}
+@media (max-width:520px){.flow{grid-template-columns:1fr}}
+
+/* stack */
+.stack{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.stack span{font-family:var(--mono);font-size:14px;padding:9px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.stack span i{font-style:normal;color:var(--dim);margin-left:6px}
+
+/* ticker */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);overflow:hidden;white-space:nowrap;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.ticker .lane{display:inline-block;padding:12px 0;animation:scroll 50s linear infinite}
+.ticker .lane span{margin:0 28px}
+.ticker .lane b{color:var(--amber);font-weight:600;margin-right:8px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker .lane,.tally{animation:none}}
+
+/* footer */
+footer{padding:56px 0 40px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+footer .sign{font-family:var(--tt);font-size:26px;color:var(--ink)}
+footer a{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#top"><img src="https://avatars.githubusercontent.com/u/263047087?v=4" alt="">weareleon</a>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#guide">Projects</a>
+      <a href="#how">How it fits</a>
+      <a href="https://github.com/weareleon">GitHub</a>
+    </nav>
+    <div class="clock"><span class="tally" aria-hidden="true"></span><span id="clock">--:--:--</span></div>
+  </div>
+</header>
+
+<main id="top">
+<div class="hero">
+  <div class="wrap" style="position:relative;z-index:1">
+    <span class="onair"><span class="tally"></span> On air · self-hosted</span>
+    <h1>weareleon<span class="bars" aria-hidden="true"></span></h1>
+    <p class="lede">We make <b>self-hosted radio, TV and music tools</b>. Point them at the media you already own and get live channels, 24/7 stations and a streaming service that run on your own box. And some other stupid stuff, ig.</p>
+    <div class="cta">
+      <a class="btn primary" href="#guide">See what's on</a>
+      <a class="btn" href="https://github.com/weareleon"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>github.com/weareleon</a>
+    </div>
+  </div>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="lane" id="ticker"></div>
+</div>
+
+<section id="about">
+  <div class="wrap about">
+    <div class="copy">
+      <div class="kicker">What is weareleon</div>
+      <h2>A tiny broadcaster that lives on your own computer.</h2>
+      <p>weareleon is a small open-source collective making the kind of software that used to need a control room. <b>TV channels with ad breaks and on-screen graphics. Radio stations with crossfades and jingles. A teletext service. A weather radio that reads the forecast aloud.</b></p>
+      <p>Everything runs on hardware you own, from a spare laptop to a cheap VPS, and plays the media already sitting on your drive or in your Jellyfin, Emby or Plex library. No cloud, no subscriptions, no accounts with anybody but yourself.</p>
+      <p>It started as "stupid stuff ig". It turns out stupid stuff can be pretty useful.</p>
+    </div>
+    <div class="principles">
+      <div class="pr"><span class="n">01</span><div><h3>Self-hosted, always</h3><p>Your library, your server, your stream. Nothing phones home.</p></div></div>
+      <div class="pr"><span class="n">02</span><div><h3>Light enough for an old laptop</h3><p>Plain Python or Node, ffmpeg and Icecast. No Docker required, nothing heavy to build.</p></div></div>
+      <div class="pr"><span class="n">03</span><div><h3>Plays nicely with your setup</h3><p>Speaks M3U, XMLTV, HDHomeRun and Icecast, so Jellyfin, Plex, VLC and TiVimate just work.</p></div></div>
+      <div class="pr"><span class="n">04</span><div><h3>Feels like real broadcast</h3><p>Hard starts, bumpers, tickers, "Up next" cards, station idents. The good bits of TV and radio.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="guide">
+  <div class="wrap">
+    <div class="guide-head">
+      <div>
+        <div class="kicker">Programme guide</div>
+        <h2>Now broadcasting</h2>
+        <p class="sub">Every project in the org, filed by channel.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Filter projects">
+        <button class="chip" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="tv" aria-pressed="false">TV</button>
+        <button class="chip" data-f="radio" aria-pressed="false">Radio</button>
+        <button class="chip" data-f="music" aria-pressed="false">Music</button>
+      </div>
+    </div>
+
+    <div class="grid" id="cards">
+
+      <article class="card feature" data-cat="tv" data-repo="tvmanager" style="--c:var(--red)">
+        <div class="strip"><span class="ch">CH 01 · TV · FLAGSHIP</span><span>TypeScript</span></div>
+        <div class="body">
+          <div>
+            <h3>tvmanager</h3>
+            <p>Turn your Plex, Jellyfin, Emby or local media into real live TV channels. Build channels in a web dashboard and watch them in Plex (as an HDHomeRun tuner), Jellyfin, TiVimate, VLC or any IPTV player.</p>
+            <ul>
+              <li>Weekly blocks, one-off specials and hard starts on the minute</li>
+              <li>Commercial breaks with bumpers, promos and "Up next" cards</li>
+              <li>Live-drawn banners, countdowns, tickers, clocks and watermarks</li>
+              <li>Gapless playback, always on air with ~48h of schedule</li>
+            </ul>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="tt" aria-label="Example TV schedule">
+              <div class="row"><span class="hdr">P101  WEARELEON TV       </span></div>
+              <div class="row y">NOW  20:00  FRIDAY MOVIE</div>
+              <div class="row c">NEXT 21:45  ADS · BUMPER · UP NEXT</div>
+              <div class="row g">     22:00  LATE NIGHT SITCOMS</div>
+              <div class="row m">SAT  00:00  NEW YEAR'S EVE LIVE</div>
+            </div>
+            <div class="tags"><span class="tag">jellyfin</span><span class="tag">plex</span><span class="tag">emby</span><span class="tag">ffmpeg</span><span class="tag">m3u</span><span class="tag">xmltv</span><span class="tag">iptv</span></div>
+          </div>
+        </div>
+        <div class="foot"><a href="https://weareleon.github.io/tvmanager/">Website &amp; docs ↗</a><a href="https://github.com/weareleon/tvmanager">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+      <article class="card" data-cat="tv" data-repo="jellytext" style="--c:var(--yellow)">
+        <div class="strip"><span class="ch">CH 00 · TV</span><span>Python</span></div>
+        <div class="body">
+          <h3>Jellytext</h3>
+          <p>Teletext for your Jellyfin server. A retro "Channel 0" with live TV listings, your library and shuffled music, streamed as a channel Jellyfin can tune.</p>
+          <ul>
+            <li>Reads your ErsatzTV guide and Jellyfin libraries</li>
+            <li>Web viewer for browsing the pages yourself</li>
+            <li>Halloween, Christmas and late-night themes</li>
+          </ul>
+          <div class="tags"><span class="tag">jellyfin</span><span class="tag">teletext</span><span class="tag">pillow</span><span class="tag">ffmpeg</span></div>
+        </div>
+        <div class="foot"><a href="https://github.com/weareleon/jellytext">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+      <article class="card" data-cat="radio" data-repo="leoncast" style="--c:var(--cyan)">
+        <div class="strip"><span class="ch">FM 02 · RADIO</span><span>Python</span></div>
+        <div class="body">
+          <h3>leonCAST</h3>
+          <p>A lightweight, self-hosted alternative to AzuraCast. Multi-station internet radio without the bloat, and without needing Docker.</p>
+          <ul>
+            <li>BPM-aware crossfading and shuffle</li>
+            <li>Playlists, day-and-time scheduling and jingles</li>
+            <li>Public listen page per station, users and auth</li>
+          </ul>
+          <div class="tags"><span class="tag">fastapi</span><span class="tag">icecast</span><span class="tag">ffmpeg</span><span class="tag">sqlite</span></div>
+        </div>
+        <div class="foot"><a href="https://github.com/weareleon/leoncast">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+      <article class="card" data-cat="radio" data-repo="svar" style="--c:var(--green)">
+        <div class="strip"><span class="ch">FM 03 · RADIO</span><span>Python</span></div>
+        <div class="body">
+          <h3>SVAR</h3>
+          <p>Skånes Väder- och Alarmradio. A NOAA Weather Radio-style station for southern Sweden that reads live SMHI forecasts and warnings aloud, 24/7.</p>
+          <ul>
+            <li>Spoken Swedish via Piper TTS</li>
+            <li>Vintage PA/EAS filter chain with static bed</li>
+            <li>No API keys: SMHI open data is free</li>
+          </ul>
+          <div class="tags"><span class="tag">smhi</span><span class="tag">piper-tts</span><span class="tag">icecast</span><span class="tag">ffmpeg</span></div>
+        </div>
+        <div class="foot"><a href="https://github.com/weareleon/svar">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+      <article class="card" data-cat="radio" data-repo="lastfm-radio" style="--c:var(--magenta)">
+        <div class="strip"><span class="ch">FM 04 · RADIO</span><span>Python</span></div>
+        <div class="body">
+          <h3>last.fm/radio</h3>
+          <p>A personal radio station built from your Last.fm scrobbles. Pulls your top tracks, streams them shuffled and gapless to Icecast, and refreshes every 30 minutes.</p>
+          <ul>
+            <li>Dashboard with now playing and recent scrobbles</li>
+            <li>Continuous ffmpeg stream, no gaps</li>
+          </ul>
+          <div class="tags"><span class="tag">last.fm</span><span class="tag">icecast</span><span class="tag">ffmpeg</span></div>
+        </div>
+        <div class="foot"><a href="https://github.com/weareleon/lastfm-radio">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+      <article class="card" data-cat="music" data-repo="leonmusic" style="--c:var(--blue)">
+        <div class="strip"><span class="ch">ST 05 · MUSIC</span><span>Python</span></div>
+        <div class="body">
+          <h3>leon.music</h3>
+          <p>A music streaming service you self-host. It lives in your system tray: point it at a folder and you're streaming from your browser in seconds.</p>
+          <ul>
+            <li>Folders become playlists, tags and cover art read automatically</li>
+            <li>Artist pages and "Essentials" mixes</li>
+            <li>Internet radio, admin theming, light and dark</li>
+          </ul>
+          <div class="tags"><span class="tag">flac</span><span class="tag">mp3</span><span class="tag">tray app</span><span class="tag">two files</span></div>
+        </div>
+        <div class="foot"><a href="https://github.com/weareleon/leonmusic">Source ↗</a><span class="meta" data-meta></span></div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">How it fits together</div>
+    <h2>From a folder of files to a channel on your TV.</h2>
+    <p class="sub">Every weareleon project follows the same simple chain, so they work alongside each other and the tools you already run.</p>
+    <div class="flow">
+      <div class="step"><div class="k">01 · SOURCE</div><h3>Your media</h3><p>A music folder, a video drive, or a Jellyfin, Emby or Plex library. Or live data, like SMHI weather.</p></div>
+      <div class="step"><div class="k">02 · SCHEDULE</div><h3>weareleon</h3><p>tvmanager, leonCAST and friends decide what airs when, add breaks, idents and graphics.</p></div>
+      <div class="step"><div class="k">03 · ENCODE</div><h3>ffmpeg</h3><p>Splices everything into one continuous stream with crossfades and overlays drawn live.</p></div>
+      <div class="step"><div class="k">04 · TUNE IN</div><h3>Anywhere</h3><p>Icecast for radio, M3U + XMLTV or HDHomeRun for TV. Watch in Jellyfin, Plex, VLC or a browser.</p></div>
+    </div>
+
+    <div class="stack" aria-label="Technologies used">
+      <span>Python<i>5 repos</i></span><span>TypeScript<i>Node 22</i></span><span>ffmpeg</span><span>Icecast</span><span>FastAPI</span><span>SQLite</span><span>Jellyfin</span><span>Plex</span><span>Emby</span><span>ErsatzTV</span><span>Piper TTS</span><span>M3U / XMLTV</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="sign">WEARELEON · CH 00 · CLOSEDOWN</div>
+      <div>Open source on <a href="https://github.com/weareleon">GitHub</a>. Made with too much ffmpeg.</div>
+    </div>
+    <div id="year"></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // clock
+  var el=document.getElementById('clock');
+  function tick(){var d=new Date();el.textContent=d.toLocaleTimeString('en-GB',{hour12:false});}
+  tick();setInterval(tick,1000);
+  document.getElementById('year').textContent='© '+new Date().getFullYear()+' weareleon';
+
+  // ticker
+  var items=[
+    ['TV','tvmanager turns your library into live channels with ad breaks'],
+    ['CH 0','Jellytext brings teletext back to Jellyfin'],
+    ['RADIO','leonCAST runs multi-station radio without Docker'],
+    ['WEATHER','SVAR reads the Skåne forecast aloud, around the clock'],
+    ['MUSIC','leon.music streams your folder from the system tray'],
+    ['SCROBBLES','last.fm/radio plays your top tracks back to you']
+  ];
+  var html=items.map(function(i){return '<span><b>'+i[0]+'</b>'+i[1]+'</span>';}).join('');
+  document.getElementById('ticker').innerHTML=html+html;
+
+  // filters
+  var chips=document.querySelectorAll('.chip'),cards=document.querySelectorAll('.card');
+  chips.forEach(function(c){c.addEventListener('click',function(){
+    chips.forEach(function(x){x.setAttribute('aria-pressed',x===c)});
+    var f=c.dataset.f;
+    cards.forEach(function(k){k.hidden=!(f==='all'||k.dataset.cat===f)});
+  })});
+
+  // live repo stats (optional, fails silently)
+  fetch('https://api.github.com/orgs/weareleon/repos?per_page=100').then(function(r){return r.ok?r.json():[]}).then(function(repos){
+    var by={};repos.forEach(function(r){by[r.name]=r});
+    cards.forEach(function(k){
+      var r=by[k.dataset.repo],m=k.querySelector('[data-meta]');
+      if(!r||!m)return;
+      var days=Math.round((Date.now()-new Date(r.pushed_at))/864e5);
+      var when=days<1?'today':days===1?'yesterday':days<45?days+'d ago':new Date(r.pushed_at).toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+      m.textContent='★ '+r.stargazers_count+' · updated '+when;
+    });
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
