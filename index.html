@@ -96,6 +96,9 @@ h2{font-size:clamp(30px,4.5vw,44px);letter-spacing:-.03em;line-height:1.1;margin
 .card li::before{content:"▸ ";color:var(--c)}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:4px}
 .tag{font-family:var(--mono);font-size:11.5px;padding:3px 8px;border-radius:6px;background:var(--bg2);border:1px solid var(--line);color:var(--muted)}
+.card .note{font-size:13.5px;margin:0 0 16px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb,var(--amber) 45%,var(--line));background:color-mix(in srgb,var(--amber) 8%,transparent)}
+.card .note b{color:var(--amber);font-weight:600}
+.card .note a{color:var(--ink)}
 .card .foot{display:flex;gap:16px;align-items:center;padding:12px 18px;border-top:1px solid var(--line);font-size:14px}
 .card .foot a{text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
 .card .foot a:hover{color:var(--c)}
@@ -288,6 +291,7 @@ footer a{color:var(--ink)}
             <li>Dashboard with now playing and recent scrobbles</li>
             <li>Continuous ffmpeg stream, no gaps</li>
           </ul>
+          <p class="note"><b>Heads up:</b> from 1 December 2026, Last.fm API keys need a <a href="https://www.last.fm/pro">Last.fm Pro</a> subscription on the account that owns the key. Last.fm is independent and the free API was getting too costly to run. <a href="https://support.last.fm/t/api-keys-will-require-pro-from-1st-december/121030">Read their announcement</a>.</p>
           <div class="tags"><span class="tag">last.fm</span><span class="tag">icecast</span><span class="tag">ffmpeg</span></div>
         </div>
         <div class="foot"><a href="https://github.com/weareleon/lastfm-radio">Source ↗</a><span class="meta" data-meta></span></div>
@@ -356,7 +360,8 @@ footer a{color:var(--ink)}
     ['RADIO','leonCAST runs multi-station radio without Docker'],
     ['WEATHER','SVAR reads the Skåne forecast aloud, around the clock'],
     ['MUSIC','leon.music streams your folder from the system tray'],
-    ['SCROBBLES','last.fm/radio plays your top tracks back to you']
+    ['SCROBBLES','last.fm/radio plays your top tracks back to you'],
+    ['NOTICE','From 1 Dec 2026, Last.fm API keys need Last.fm Pro']
   ];
   var html=items.map(function(i){return '<span><b>'+i[0]+'</b>'+i[1]+'</span>';}).join('');
   document.getElementById('ticker').innerHTML=html+html;
